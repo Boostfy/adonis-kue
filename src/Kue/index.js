@@ -24,6 +24,7 @@ class Kue {
   get instance () {
     if (!this._instance) {
       const options = {
+        jobEvents: false,
         ...(this.config.options || {}),
         redis: {
           createClientFactory: () => {
