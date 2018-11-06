@@ -65,6 +65,7 @@ class Kue {
       .create(key, data)
       .priority(priority)
       .attempts(attempts)
+      .events(false)
       .removeOnComplete(remove)
 
     // allow custom functions to be called on the job, e.g. backoff
