@@ -24,6 +24,7 @@ class Kue {
   get instance () {
     if (!this._instance) {
       const options = {
+        ...(this.config.options || {}),
         redis: {
           createClientFactory: () => {
             const { connection } = this.config
@@ -53,7 +54,7 @@ class Kue {
   * @param  {String} priority  Priority of job
   * @param  {Number} attempts  How many times to attempt the job
   * @param  {Boolean} remove   Should completed jobs be removed from kue
-  * @returns {Object}          Kue job instance
+  * @returns {Promise}         Kue job instance
   * @public
   */
   dispatch (key, data, { priority = 'normal', attempts = 1, remove = true, jobFn = () => {} } = {}) {
@@ -69,21 +70,15 @@ class Kue {
     // allow custom functions to be called on the job, e.g. backoff
     jobFn(job)
 
-    job.save(err => {
-      if (err) {
-        this.Logger.error('An error has occurred while creating a Kue job.')
-        throw err
-      }
-    })
-
-    // Add promise proxy on job for complete event
-    job.result = new Promise((resolve, reject) => {
-      job.on('complete', result => {
-        resolve(result)
+    return new Promise((resolve, reject) => {
+      job.save(err => {
+        if (err) {
+          this.Logger.error('An error has occurred while creating a Kue job.')
+          return reject(err)
+        }
+        return resolve(job)
       })
     })
-
-    return job
   }
 
   /**
