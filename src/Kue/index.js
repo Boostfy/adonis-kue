@@ -119,7 +119,7 @@ class Kue {
 
       // Register job handler
       this.instance.process(Job.key, Job.concurrency, (job, done) => {
-        jobInstance.handle(job.data)
+        jobInstance.handle(job.data, job)
           .then(result => {
             done(null, result)
           })
