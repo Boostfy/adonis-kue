@@ -50,6 +50,12 @@ class Kue {
           process.exit(0);
         });
       });
+      process.once('SIGINT', function ( sig ) {
+        this._instance.shutdown(5000, function(err) {
+          console.log( '------- Kue shutdown: ', err||'' );
+          process.exit(0);
+        });
+      });
     }
     return this._instance
   }
