@@ -44,15 +44,15 @@ class Kue {
         }
       }
       this._instance = kue.createQueue(options)
-      process.once( 'SIGTERM', function ( sig ) {
+      process.once('SIGTERM', sig  => {
         this._instance.shutdown(100, function(err) {
-          console.log( '------- Kue shutdown: ', err||'' );
+          console.log( '------- Kue shutdown (SIGTERM): ', err||'' );
           process.exit(0);
         });
       });
-      process.once('SIGINT', function ( sig ) {
+      process.once('SIGINT', sig  => {
         this._instance.shutdown(100, function(err) {
-          console.log( '------- Kue shutdown: ', err||'' );
+          console.log( '------- Kue shutdown (SIGINT): ', err||'' );
           process.exit(0);
         });
       });
@@ -131,6 +131,10 @@ class Kue {
 
       // Register job handler
       this.instance.process(Job.key, Job.concurrency, (job, done) => {
+        if (!job) {
+          console.error('------ NO JOB (from kue) ---------')
+          done(null, true)
+        }
         jobInstance.handle(job.data, job)
           .then(result => {
             done(null, result)
