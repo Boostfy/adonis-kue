@@ -119,13 +119,6 @@ class Kue {
         throw new Error(`Job concurrency value must be a number but instead it is: <${typeof Job.concurrency}>`)
       }
 
-      const jobInstance = ioc.make(Job)
-
-      // Every job must expose a handle function
-      if (!jobInstance.handle) {
-        throw new Error(`No handler found for job: ${link}`)
-      }
-
       // Track currently registered jobs in memory
       this.registeredJobs.push(Job)
 
@@ -134,6 +127,15 @@ class Kue {
         if (!job) {
           console.error('------ NO JOB (from kue) ---------')
           done(null, true)
+        }
+        const jobInstance = ioc.make(Job)
+
+        // Every job must expose a handle function
+        if (!jobInstance.handle) {
+          throw new Error(`No handler found for job: ${link}`)
+        }
+        if (jobInstance.setData) {
+          jobInstance.setData(job.data)
         }
         jobInstance.handle(job.data, job)
           .then(result => {
