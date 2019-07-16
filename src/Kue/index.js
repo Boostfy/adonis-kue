@@ -139,9 +139,15 @@ class Kue {
         }
         jobInstance.handle(job.data, job)
           .then(result => {
+            if (jobInstance.deleteJob) {
+              jobInstance.deleteJob(job)
+            }
             done(null, result)
           })
           .catch(error => {
+            if (jobInstance.deleteJob) {
+              jobInstance.deleteJob(job)
+            }
             this.Logger.error(`Error processing job. type=${job.type} id=${job.id}`)
             done(error)
           })
