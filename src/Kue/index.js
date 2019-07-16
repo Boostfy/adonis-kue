@@ -134,8 +134,8 @@ class Kue {
         if (!jobInstance.handle) {
           throw new Error(`No handler found for job: ${link}`)
         }
-        if (jobInstance.setData) {
-          jobInstance.setData(job.data)
+        if (jobInstance.setJob) {
+          jobInstance.setJob(job)
         }
         jobInstance.handle(job.data, job)
           .then(result => {
