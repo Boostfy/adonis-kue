@@ -44,14 +44,15 @@ class Kue {
         }
       }
       this._instance = kue.createQueue(options)
+      this._instance.watchStuckJobs(10000)
       process.once('SIGTERM', sig  => {
-        this._instance.shutdown(100, function(err) {
+        this._instance.shutdown(5000, function(err) {
           console.log( '------- Kue shutdown (SIGTERM): ', err||'' );
           process.exit(0);
         });
       });
       process.once('SIGINT', sig  => {
-        this._instance.shutdown(100, function(err) {
+        this._instance.shutdown(5000, function(err) {
           console.log( '------- Kue shutdown (SIGINT): ', err||'' );
           process.exit(0);
         });
